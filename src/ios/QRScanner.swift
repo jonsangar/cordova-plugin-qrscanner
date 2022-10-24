@@ -60,7 +60,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
     var scanning: Bool = false
     var paused: Bool = false
     var nextScanningCommand: CDVInvokedUrlCommand?
-    var formatList: [AVMetadataObject.ObjectType] = [AVMetadataObject.ObjectType.qr];
+    //var formatList: [AVMetadataObject.ObjectType] = [AVMetadataObject.ObjectType.qr];
 
     enum QRScannerError: Int32 {
         case unexpected_error = 0,
@@ -135,7 +135,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
         "AZTEC": AVMetadataObject.ObjectType.aztec
     ]
 
-    func setAcceptableFormatList(arg: Any) {
+    /*func setAcceptableFormatList(arg: Any) {
         do {
             if !(arg is [String : Any]) {
                 throw CaptureError.invalidFormat
@@ -151,12 +151,12 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
         } catch {
             formatList = [AVMetadataObject.ObjectType.qr]
         }
-    }
+    }*/
 
     @objc func prepScanner(command: CDVInvokedUrlCommand) -> Bool{
-        if (command.arguments.count > 0) {
+        /*if (command.arguments.count > 0) {
             setAcceptableFormatList(arg: command.argument(at: 0)!)
-        } // Otherwise, use previously set format list
+        } // Otherwise, use previously set format list*/
 
         let status = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
         if (status == AVAuthorizationStatus.restricted) {
@@ -170,7 +170,12 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
             if (captureSession?.isRunning != true){
                 cameraView.backgroundColor = UIColor.clear
                 self.webView!.superview!.insertSubview(cameraView, belowSubview: self.webView!)
-                let availableVideoDevices =  AVCaptureDevice.devices(for: AVMediaType.video)
+                let deviceDiscoverySession = AVCaptureDevice.DiscoverySession(
+                    deviceTypes: [ .builtInWideAngleCamera, .builtInDualCamera ],
+                    mediaType: .video,
+                    position: .unspecified
+                )
+                let availableVideoDevices =   deviceDiscoverySession.devices;
                 for device in availableVideoDevices {
                     if device.position == AVCaptureDevice.Position.back {
                         backCamera = device
@@ -275,8 +280,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
             return
         }
         let found = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
-        if (formatList.contains { $0 == found.type }  &&
-            found.stringValue != nil) {
+        if found.type == AVMetadataObject.ObjectType.qr && found.stringValue != nil {
             scanning = false
             let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: found.stringValue)
             commandDelegate!.send(pluginResult, callbackId: nextScanningCommand?.callbackId!)
