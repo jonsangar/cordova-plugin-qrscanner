@@ -49,9 +49,9 @@
   "author": "Jason Dreyzehner",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bitpay/cordova-plugin-qrscanner/issues"
+    "url": "https://github.com/jonsangar/cordova-plugin-qrscanner/issues"
   },
-  "homepage": "https://github.com/bitpay/cordova-plugin-qrscanner",
+  "homepage": "https://github.com/jonsangar/cordova-plugin-qrscanner",
   "main": "dist/cordova-plugin-qrscanner-lib.min.js",
   "dependencies": {
     "nopt": "^4.0.1",
