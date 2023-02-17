@@ -47,7 +47,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
             }
         }
     }
-    
+    // var backgroundColor: UIColor?
     var cameraView: CameraView!
     var captureSession:AVCaptureSession?
     var captureVideoPreviewLayer:AVCaptureVideoPreviewLayer?
@@ -170,12 +170,13 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
             if (captureSession?.isRunning != true){
                 cameraView.backgroundColor = UIColor.clear
                 self.webView!.superview!.insertSubview(cameraView, belowSubview: self.webView!)
-                let deviceDiscoverySession = AVCaptureDevice.DiscoverySession(
-                    deviceTypes: [ .builtInWideAngleCamera, .builtInDualCamera ],
-                    mediaType: .video,
-                    position: .unspecified
-                )
-                let availableVideoDevices =   deviceDiscoverySession.devices;
+                // let deviceDiscoverySession = AVCaptureDevice.DiscoverySession(
+                //     deviceTypes: [ .builtInWideAngleCamera, .builtInDualCamera ],
+                //     mediaType: .video,
+                //     position: .unspecified
+                // )
+                // let availableVideoDevices =   deviceDiscoverySession.devices;
+                let availableVideoDevices =  AVCaptureDevice.devices(for: AVMediaType.video)
                 for device in availableVideoDevices {
                     if device.position == AVCaptureDevice.Position.back {
                         backCamera = device
@@ -240,7 +241,15 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
 
     @objc func makeOpaque(){
         self.webView?.isOpaque = false
+        // if let safeBgColor = self.backgroundColor {
+        //     self.webView?.backgroundColor = safeBgColor
+        //     self.webView?.scrollView.backgroundColor = safeBgColor
+        // } else {
+        //     self.webView?.backgroundColor = UIColor.clear
+        //     self.webView?.scrollView.backgroundColor = UIColor.clear
+        // }
         self.webView?.backgroundColor = UIColor.clear
+        
     }
 
     @objc func boolToNumberString(bool: Bool) -> String{
@@ -332,6 +341,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
     }
 
     @objc func show(_ command: CDVInvokedUrlCommand) {
+        // self.backgroundColor = self.webView?.backgroundColor;
         self.webView?.isOpaque = false
         self.webView?.backgroundColor = UIColor.clear
         self.webView?.scrollView.backgroundColor = UIColor.clear
@@ -511,7 +521,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
 
     @objc func openSettings(_ command: CDVInvokedUrlCommand) {
         if #available(iOS 10.0, *) {
-            guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            guard let settingsUrl = URL(string: UIApplicationOpenSettingsURLString) else {
             return
         }
         if UIApplication.shared.canOpenURL(settingsUrl) {
@@ -524,7 +534,7 @@ class QRScanner : CDVPlugin, AVCaptureMetadataOutputObjectsDelegate {
         } else {
             // pre iOS 10.0
             if #available(iOS 8.0, *) {
-                UIApplication.shared.openURL(NSURL(string: UIApplication.openSettingsURLString)! as URL)
+                UIApplication.shared.openURL(NSURL(string: UIApplicationOpenSettingsURLString)! as URL)
                 self.getStatus(command)
             } else {
                 self.sendErrorCode(command: command, error: QRScannerError.open_settings_unavailable)
